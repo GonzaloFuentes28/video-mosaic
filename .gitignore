@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+.env
+CLAUDE.md
+.claude/
+RELEASE_GUIDE.md
+mosaic.jpg
