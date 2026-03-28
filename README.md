@@ -25,17 +25,8 @@ Extract frames from a video and arrange them into a single mosaic image.
 
 ## Installation
 
-### With pip
-
 ```bash
 pip install video-mosaic
-```
-
-### With Homebrew (macOS / Linux)
-
-```bash
-brew tap GonzaloFuentes28/tap
-brew install video-mosaic
 ```
 
 ### From source
