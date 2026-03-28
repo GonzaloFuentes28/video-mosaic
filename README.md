@@ -157,6 +157,7 @@ Requires [yt-dlp](https://github.com/yt-dlp/yt-dlp): `pip install yt-dlp` or `br
 
 | Flag | Description |
 |---|---|
+| `--open` | Open the output image after saving |
 | `--no-progress` | Disable progress bar |
 
 ## Examples
