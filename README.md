@@ -25,6 +25,15 @@ Extract frames from a video and arrange them into a single mosaic image.
 
 ## Installation
 
+### With Homebrew (macOS)
+
+```bash
+brew tap GonzaloFuentes28/tap
+brew install video-mosaic
+```
+
+### With pip
+
 ```bash
 pip install video-mosaic
 ```
@@ -50,6 +59,13 @@ sudo apt install ffmpeg
 
 # Arch
 sudo pacman -S ffmpeg
+```
+
+To download videos from URLs (YouTube, Twitter/X, TikTok, etc.), you also need **yt-dlp**:
+
+```bash
+brew install yt-dlp   # macOS
+pip install yt-dlp     # or via pip
 ```
 
 ## Quick start
