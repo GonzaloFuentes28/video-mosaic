@@ -1,10 +1,15 @@
 """Download videos from URLs using yt-dlp."""
 
 import os
+import re
+import subprocess
+import threading
 from collections.abc import Callable
 from urllib.parse import urlparse
 
 from . import VideoMosaicError
+
+SUBPROCESS_TIMEOUT = 600  # 10 minutes
 
 
 def is_url(value: str) -> bool:
@@ -22,7 +27,7 @@ def download_video(
     quality: int | None = None,
     on_progress: Callable[[float], None] | None = None,
 ) -> None:
-    """Download a video from a URL using yt-dlp.
+    """Download a video from a URL using yt-dlp (CLI).
 
     Args:
         url: The video URL.
@@ -38,44 +43,45 @@ def download_video(
         if quality < 1:
             raise VideoMosaicError(f"Quality must be a positive integer, got {quality}.")
 
+    cmd = [
+        "yt-dlp", "--no-playlist", "--newline",
+        "--merge-output-format", "mp4",
+        "-o", output_path,
+    ]
+
+    if quality is not None:
+        cmd += ["-f", f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]/best"]
+    else:
+        cmd += ["-f", "bestvideo+bestaudio/best"]
+
+    cmd += ["--", url]
+
     try:
-        import yt_dlp
-    except ImportError:
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    except FileNotFoundError:
         raise VideoMosaicError(
             "yt-dlp is required for URL downloads. Install it with:\n"
             "  pip install yt-dlp\n"
             "  brew install yt-dlp"
         )
 
-    def _progress_hook(d: dict) -> None:
-        if on_progress and d.get("status") == "downloading":
-            total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
-            downloaded = d.get("downloaded_bytes", 0)
-            if total > 0:
-                on_progress(downloaded / total * 100)
+    # Parse progress from yt-dlp output (e.g. "[download]  45.2% of 3.50MiB")
+    pct_re = re.compile(r"\[download\]\s+([\d.]+)%")
 
-    if quality is not None:
-        fmt = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]/best"
-    else:
-        fmt = "bestvideo+bestaudio/best"
+    def _read_output() -> None:
+        for line in proc.stdout:
+            if on_progress:
+                m = pct_re.search(line)
+                if m:
+                    on_progress(float(m.group(1)))
 
-    opts = {
-        "format": fmt,
-        "outtmpl": output_path,
-        "noplaylist": True,
-        "merge_output_format": "mp4",
-        "quiet": True,
-        "no_warnings": True,
-        "progress_hooks": [_progress_hook],
-    }
+    reader = threading.Thread(target=_read_output, daemon=True)
+    reader.start()
+    proc.wait(timeout=SUBPROCESS_TIMEOUT)
+    reader.join(timeout=5)
 
-    try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            ydl.download([url])
-    except yt_dlp.utils.DownloadError as e:
+    if proc.returncode != 0:
         raise VideoMosaicError(f"yt-dlp failed to download '{url}'.")
-    except Exception as e:
-        raise VideoMosaicError(f"Download failed: {e}")
 
     if not os.path.isfile(output_path):
         raise VideoMosaicError("Download finished but no video file was produced.")

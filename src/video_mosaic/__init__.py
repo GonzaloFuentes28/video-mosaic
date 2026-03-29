@@ -1,6 +1,6 @@
 """video-mosaic — Extract frames from a video and compose them into a mosaic image."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 class VideoMosaicError(RuntimeError):

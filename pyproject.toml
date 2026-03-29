@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "video-mosaic"
-version = "0.1.0"
+version = "0.1.1"
 description = "Extract frames from a video and compose them into a single mosaic image."
 readme = "README.md"
 license = "MIT"
@@ -35,15 +35,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-urls = [
-    "yt-dlp>=2023.0",
-]
 dev = [
     "build",
     "twine",
     "ruff",
     "pytest",
-    "yt-dlp>=2023.0",
 ]
 
 [project.urls]
