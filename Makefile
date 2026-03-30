@@ -15,8 +15,7 @@ format:
 	ruff format src/
 
 test:
-	video-mosaic --help
-	@echo "✓ CLI loads correctly"
+	pytest tests/ -v
 
 build: clean
 	python -m build

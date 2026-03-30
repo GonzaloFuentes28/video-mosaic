@@ -151,24 +151,30 @@ def _extract_single_frame(
     index: int,
     timestamp: float,
 ) -> tuple[int, Path, float] | None:
-    """Extract one frame at a given timestamp. Returns (index, path, timestamp) or None."""
+    """Extract one frame at a given timestamp. Returns (index, path, timestamp) or None.
+
+    Silently returns None if ffmpeg fails for this frame (e.g. seeking past end of video).
+    """
     out = os.path.join(tmp_dir, f"frame_{index:08d}.jpg")
-    _run_ffmpeg(
-        [
-            "ffmpeg",
-            "-v",
-            "quiet",
-            "-ss",
-            f"{timestamp:.4f}",
-            "-i",
-            video_path,
-            "-frames:v",
-            "1",
-            "-qscale:v",
-            "3",
-            out,
-        ],
-    )
+    try:
+        _run_ffmpeg(
+            [
+                "ffmpeg",
+                "-v",
+                "quiet",
+                "-ss",
+                f"{timestamp:.4f}",
+                "-i",
+                video_path,
+                "-frames:v",
+                "1",
+                "-qscale:v",
+                "3",
+                out,
+            ],
+        )
+    except VideoMosaicError:
+        return None
     if os.path.exists(out):
         return (index, Path(out), timestamp)
     return None
