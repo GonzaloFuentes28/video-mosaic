@@ -1,10 +1,10 @@
 """Mosaic composition: arrange frames into a grid image."""
 
 import math
-import sys
+from collections.abc import Callable
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from .utils import fmt_timestamp, load_font
 
@@ -20,6 +20,7 @@ def compose_mosaic(
     bg_color: str = "#1a1a1a",
     labels: bool = False,
     header_info: dict | None = None,
+    on_progress: Callable[[int, int], None] | None = None,
 ) -> Image.Image:
     """Arrange frames into a grid and save the resulting image. Returns the canvas."""
     if not frames:
@@ -95,6 +96,9 @@ def compose_mosaic(
                 fill="#cccccc",
                 font=font,
             )
+
+        if on_progress:
+            on_progress(idx + 1, total)
 
     # Save image
     ext = Path(output_path).suffix.lower()
