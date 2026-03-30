@@ -80,15 +80,21 @@ video-mosaic video.mp4 --every 5s -o contact-sheet.jpg
 # Every single frame of a short clip
 video-mosaic clip.mp4 --all -o all-frames.png
 
+# One frame per scene change (cuts/transitions)
+video-mosaic video.mp4 --scenes -o scenes.jpg
+
 # From a URL (requires yt-dlp)
 video-mosaic "https://youtube.com/watch?v=abc" --frames 48 --quality 720
 video-mosaic "https://x.com/user/status/123" --frames 24
+
+# Batch mode — process multiple videos at once
+video-mosaic *.mp4 --frames 24 -o output/
 ```
 
 ## Usage
 
 ```
-video-mosaic INPUT [options]
+video-mosaic INPUT [INPUT ...] [options]
 ```
 
 ### Frame selection (pick one)
@@ -98,6 +104,18 @@ video-mosaic INPUT [options]
 | `--frames N` | Extract exactly N frames, evenly distributed |
 | `--every INTERVAL` | One frame per interval (`5s`, `500ms`, `0.5`) |
 | `--all` | Every single frame (careful with long videos) |
+| `--scenes` | One frame per scene change (cut detection via ffmpeg) |
+
+### Scene detection options
+
+| Flag | Default | Description |
+|---|---|---|
+| `--scene-threshold FLOAT` | 0.3 | Sensitivity 0.0–1.0 (lower = more scenes detected) |
+
+```bash
+# Detect scene changes with higher sensitivity
+video-mosaic video.mp4 --scenes --scene-threshold 0.1 --labels
+```
 
 ### Trimming
 
@@ -160,6 +178,23 @@ video-mosaic video.mp4 --frames 48 --labels --pdf storyboard.pdf
 
 Requires [yt-dlp](https://github.com/yt-dlp/yt-dlp): `pip install yt-dlp` or `brew install yt-dlp`.
 
+### Batch mode
+
+Pass multiple files to process them all in one command. Outputs are auto-named as `{filename}_mosaic.jpg`.
+
+```bash
+# Process all MP4s in the current directory
+video-mosaic *.mp4 --frames 24
+
+# Save all mosaics to a specific directory
+video-mosaic clip1.mp4 clip2.mp4 clip3.mp4 --frames 24 -o output/
+
+# Batch with PDF export
+video-mosaic *.mp4 --scenes --pdf output/
+```
+
+In batch mode, failures on individual videos don't stop the rest — a summary is shown at the end.
+
 ### Other
 
 | Flag | Description |
@@ -181,6 +216,9 @@ video-mosaic lecture.mp4 -o sheet.webp --every 10s --skip-dupes --thumb-width 40
 
 # Just the intro of a video, reversed, as PDF
 video-mosaic video.mp4 --frames 20 --from 0:00 --to 0:30 --reverse --pdf intro.pdf
+
+# Scene-based mosaic of a music video
+video-mosaic "https://youtube.com/watch?v=abc" --scenes --labels --quality 720
 ```
 
 ## Project structure
