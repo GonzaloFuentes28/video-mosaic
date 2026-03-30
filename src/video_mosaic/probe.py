@@ -16,13 +16,19 @@ def get_video_info(video_path: str) -> dict:
         VideoMosaicError: If ffprobe is not found or the file cannot be probed.
     """
     cmd = [
-        "ffprobe", "-v", "quiet",
-        "-print_format", "json",
-        "-show_format", "-show_streams",
+        "ffprobe",
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
+        "-show_format",
+        "-show_streams",
         video_path,
     ]
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=SUBPROCESS_TIMEOUT)
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, check=True, timeout=SUBPROCESS_TIMEOUT
+        )
     except FileNotFoundError:
         raise VideoMosaicError("ffmpeg/ffprobe not found. Install ffmpeg first.")
     except subprocess.CalledProcessError:

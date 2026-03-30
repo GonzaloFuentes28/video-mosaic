@@ -82,7 +82,9 @@ def export_pdf(
 
         # Page number
         page_label = f"Page {page_idx + 1}"
-        draw.text((page_w - margin - 80, page_h - margin - 10), page_label, fill="#aaaaaa", font=font)
+        draw.text(
+            (page_w - margin - 80, page_h - margin - 10), page_label, fill="#aaaaaa", font=font
+        )
         pages.append(page)
 
     if pages:

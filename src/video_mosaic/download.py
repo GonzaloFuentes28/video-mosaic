@@ -44,9 +44,13 @@ def download_video(
             raise VideoMosaicError(f"Quality must be a positive integer, got {quality}.")
 
     cmd = [
-        "yt-dlp", "--no-playlist", "--newline",
-        "--merge-output-format", "mp4",
-        "-o", output_path,
+        "yt-dlp",
+        "--no-playlist",
+        "--newline",
+        "--merge-output-format",
+        "mp4",
+        "-o",
+        output_path,
     ]
 
     if quality is not None:
