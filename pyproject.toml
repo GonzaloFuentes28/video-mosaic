@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "video-mosaic"
-version = "0.1.1"
+version = "0.2.0"
 description = "Extract frames from a video and compose them into a single mosaic image."
 readme = "README.md"
 license = "MIT"
